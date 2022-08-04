@@ -1,0 +1,12 @@
+#!/usr/bin/osascript
+
+
+tell app "Terminal"
+    if not (exists window 1) then reopen
+    activate
+
+    set UnixPath to POSIX path of ((path to me as text) & "::") 
+    set Coconut to "exec '" & UnixPath & "wifi_coconut'" 
+
+    do script Coconut
+end tell

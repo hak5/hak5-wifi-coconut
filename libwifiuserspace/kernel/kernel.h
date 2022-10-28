@@ -113,7 +113,9 @@
  * @x: first value
  * @y: second value
  */
+#ifndef max
 #define max(x, y)	__cmp(x, y, >)
+#endif
 
 /*
  * This looks more complex than it should be. But we need to

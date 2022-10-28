@@ -1,6 +1,5 @@
 # Based on the hackrf cmakefiles, in turn based on the libftdi cmake
 
-cmake_minimum_required(VERSION 2.8)
 project(libwifiuserspace C)
 set(PACKAGE libwifiuserspace)
 include(${PROJECT_SOURCE_DIR}/../cmake/set_release.cmake)
@@ -16,6 +15,28 @@ if(MSVC)
     include_directories(${LIBUSB_1_INCLUDE_DIR})
     link_directories(${LIBUSB_1_LIBRARY_DIR})
     set(INT_LIBUSB_LIBS ${LIBUSB_1_LIBRARIES})
+
+    set(sharedir "./")
+    set(INSTALL_LIB_DIR "./")
+    set(INSTALL_DEFAULT_BINDIR "./")
+elseif (MINGW32)
+    #find_package(PThread REQUIRED)
+    #include_directories(${PTHREAD_INCLUDE_DIR}) 
+    #set(INT_THREAD_LIBS ${PTHREADS_LIBRARY})
+
+    #find_package(LibUSB-1.0 REQUIRED)
+    #include_directories(${LIBUSB_1_INCLUDE_DIR})
+    #link_directories(${LIBUSB_1_LIBRARY_DIR})
+    #set(INT_LIBUSB_LIBS ${LIBUSB_1_LIBRARIES})
+
+    find_package(Threads REQUIRED)
+    set(INT_THREAD_LIBS ${THREADS_LIBRARY})
+
+    #find_package(USB1 REQUIRED)
+    #include_directories(${LIBUSB_INCLUDE_DIR})
+    #set(INT_LIBUSB_LIBS ${LIBUSB_LIBRARIES})
+    include_directories("${VCPKG_HOME}/installed/x64-mingw-static/include/libusb-1.0")
+    set(INT_LIBUSB_LIBS "${VCPKG_HOME}/installed/x64-mingw-static/lib/libusb-1.0.a")
 
     set(sharedir "./")
     set(INSTALL_LIB_DIR "./")

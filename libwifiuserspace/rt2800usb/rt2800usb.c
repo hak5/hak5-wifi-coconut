@@ -19,7 +19,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #else
-#include <Windows.h>
+#include <windows.h>
 #define usleep(x) Sleep((x) < 1000 ? 1 : (x) / 1000)
 #endif
 

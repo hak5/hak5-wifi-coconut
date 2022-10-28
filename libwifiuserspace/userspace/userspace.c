@@ -17,7 +17,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #else
-#include <Windows.h>
+#include <windows.h>
 #define usleep(x) Sleep((x) < 1000 ? 1 : (x) / 1000)
 #define sleep(x) Sleep(x * 1000)
 #endif
@@ -29,7 +29,7 @@
 #include "userspace.h"
 #include "rt2800usb/rt2800usb.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
  /*
   * Kluge a windows time into a user time
   */
@@ -55,6 +55,9 @@ int gettimeofday(struct timeval* tp, struct timezone* tzp) {
    ((a)->tv_usec CMP (b)->tv_usec) : \
    ((a)->tv_sec CMP (b)->tv_sec))
 
+#endif
+
+#ifdef _WIN32
 #define	timeradd(a, b, result) \
   do { \
     (result)->tv_sec = (a)->tv_sec + (b)->tv_sec; \

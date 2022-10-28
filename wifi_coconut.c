@@ -17,7 +17,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #else
-#include <Windows.h>
+#include <windows.h>
 #define sleep(x) Sleep(x*1000)
 #define usleep(x) Sleep((x) < 1000 ? 1 : (x) / 1000)
 #endif

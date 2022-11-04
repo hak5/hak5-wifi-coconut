@@ -1,0 +1,16 @@
+diff --git a/libwifiuserspace/userspace/userspace.c b/libwifiuserspace/userspace/userspace.c
+index 3c8a352..1d08d2c 100644
+--- a/libwifiuserspace/userspace/userspace.c
++++ b/libwifiuserspace/userspace/userspace.c
+@@ -683,9 +683,11 @@ void *_userspace_wifi_led_thread(void *ctx) {
+                 sleep_ts.tv_sec = diff_ts.tv_sec;
+                 sleep_ts.tv_usec = diff_ts.tv_usec;
+ 
++#if 0
+                 if (sleep_ts.tv_sec > 0) {
+                     printf("something weird in sleep for device %d: %lu secs\n", led->dev->dev_id, sleep_ts.tv_sec);
+                 }
++#endif
+             }
+ 
+             led = led->next;

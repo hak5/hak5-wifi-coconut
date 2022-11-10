@@ -512,7 +512,7 @@ int noninteractive_coconut_cb(struct wifi_coconut_context *coconut_context,
                             "        tool under 'sudo'\n");
                 } else {
                     fprintf(stderr, "ERROR:  No Wi-Fi Coconut radios found.  Make sure that your USB cable is plugged\n"
-                                    "into the datsa port of the Wi-Fi Coconut.\n");
+                                    "into the data port of the Wi-Fi Coconut.\n");
                 }
 #endif
                 fprintf(stderr, "Use the '--wait' option to wait for a Wi-Fi Coconut to be connected.\n");

@@ -15,7 +15,7 @@
             "name": "CMAKE_TOOLCHAIN_FILE",
             "value": "C:\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
             "type": "STRING"
-        },
+        }
       ]
     }
   ]

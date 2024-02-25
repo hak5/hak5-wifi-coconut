@@ -91,7 +91,8 @@ struct coconut_tool_context {
 #define DLT_IEEE802_11	105	/* IEEE 802.11 wireless */
 #define DLT_IEEE802_11_RADIO	127	/* 802.11 plus radiotap radio header */
 
-int open_coconut_pcap(struct coconut_tool_context *tool_context) {
+
+static int do_open_pcap_file(struct coconut_tool_context *tool_context) {
     struct {
         uint32_t magic_number;   /* magic number */
         uint16_t version_major;  /* major version number */
@@ -112,31 +113,57 @@ int open_coconut_pcap(struct coconut_tool_context *tool_context) {
     pcap_hdr_t.sigfigs = 0;
     pcap_hdr_t.snaplen = 8192;
 
-    tool_context->enable_pcap_log = true;
-    pthread_mutex_init(&tool_context->pcap_mutex, NULL);
-
     if (tool_context->no_radiotap)
         pcap_hdr_t.network = DLT_IEEE802_11;
     else
         pcap_hdr_t.network = DLT_IEEE802_11_RADIO;
 
-    if (strcmp(tool_context->pcap_fname, "-") == 0)
-        tool_context->dump_filep = stdout;
-    else
-        tool_context->dump_filep = fopen(tool_context->pcap_fname, "wb");
+    pthread_mutex_lock(&tool_context->pcap_mutex);
 
-    if (tool_context->dump_filep == NULL) {
+    FILE *old_file = tool_context->dump_filep;
+    FILE *new_file;
+    if (strcmp(tool_context->pcap_fname, "-") == 0) {
+        new_file = stdout;
+    } else {
+        new_file = fopen(tool_context->pcap_fname, "wb");
+    }
+
+    if (new_file == NULL) {
         fprintf(stderr, "ERROR: Could not open dump: %d %s\n", errno, strerror(errno));
+        pthread_mutex_unlock(&tool_context->pcap_mutex);
         return -1;
     }
 
-    fwrite(&pcap_hdr_t, sizeof(pcap_hdr_t), 1, tool_context->dump_filep);
+    fwrite(&pcap_hdr_t, sizeof(pcap_hdr_t), 1, new_file);
 
-    if (!tool_context->coconut_context->quiet && tool_context->dump_filep != stdout) {
+    if (!tool_context->coconut_context->quiet && new_file != stdout) {
         fprintf(stderr, "Opened PCAP file '%s'\n", tool_context->pcap_fname);
     }
 
+    if (old_file != NULL) {
+        fclose(old_file);
+    }
+    tool_context->dump_filep = new_file;
+
+    pthread_mutex_unlock(&tool_context->pcap_mutex);
+
     return 1;
+}
+
+int reopen_pcap_file(struct coconut_tool_context *tool_context) {
+    if (tool_context->dump_filep == NULL) {
+        return 1;
+    }
+
+    return do_open_pcap_file(tool_context);
+
+}
+
+int open_coconut_pcap(struct coconut_tool_context *tool_context) {
+    tool_context->enable_pcap_log = true;
+    pthread_mutex_init(&tool_context->pcap_mutex, NULL);
+
+    return do_open_pcap_file(tool_context);
 }
 
 void ANSI_PREP() {
@@ -872,6 +899,12 @@ void print_usage(char *argv) {
            " --quiet               Disable most output\n");
 }
 
+struct coconut_tool_context tool_context;
+
+void sighup_handler() {
+    reopen_pcap_file(&tool_context);
+}
+
 int main(int argc, char *argv[]) {
 #define OPT_HELP        'h'
 #define OPT_LIST        2
@@ -908,10 +941,11 @@ int main(int argc, char *argv[]) {
     int r;
 
     struct userspace_wifi_context *context;
-    struct coconut_tool_context tool_context;
     struct wifi_coconut_context *coconut_context;
 
     memset(&tool_context, 0, sizeof(struct coconut_tool_context));
+
+    signal(SIGHUP, sighup_handler);
 
     tool_context.coconut_context = init_coconut_context();
     coconut_context = tool_context.coconut_context;

@@ -271,7 +271,7 @@ int find_coconuts_cluster(struct wifi_coconut_context *coconut_context,
         /* If we found any raw compatible devices, just make a coconut out of them
          * and call it good enough */
         if (num_raw_devices > 0) {
-            fprintf(stderr, "Fallinh back to raw WiFi devices. Found %d\n", num_raw_devices);
+            fprintf(stderr, "Falling back to raw WiFi devices. Found %d\n", num_raw_devices);
 
             coconut_iter = (struct wifi_coconut *) malloc(sizeof(*coconut_iter));
             if (coconut_iter == NULL) {
